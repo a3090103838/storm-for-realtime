@@ -16,7 +16,7 @@
 package datasalt.storm.feeds;
 
 import backtype.storm.Config;
-import backtype.storm.StormSubmitter;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
@@ -45,11 +45,15 @@ public class FeedTopology {
 		return builder.createTopology();
 	}
 
-	public static void main(String[] args) throws AlreadyAliveException, InvalidTopologyException {
+	public static void main(String[] args) throws AlreadyAliveException, InvalidTopologyException, InterruptedException {
 		Config conf = new Config();
 		conf.setDebug(true);
-		conf.setNumWorkers(2);
-		conf.setMaxSpoutPending(1);
-		StormSubmitter.submitTopology("feedTopology", conf, buildTopology(Constants.FEEDS));
+
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("feedTopology", conf, buildTopology(Constants.FEEDS));
+    
+        Thread.sleep(10000000);
+
+        cluster.shutdown();
 	}
 }
